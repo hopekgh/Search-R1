@@ -451,22 +451,57 @@ If I want to give the final answer, I should put the answer between <answer> and
         return [self._passages2string(result) for result in results]
 
     def _batch_search(self, queries):
+        """
+        Call the search API with the given queries.
+        This method works with both traditional retrieval servers and our Gemini QA server.
         
+        Args:
+            queries: List of search queries
+            
+        Returns:
+            JSON response from the search server
+        """
+        if not queries:
+            return {"result": []}
+            
         payload = {
             "queries": queries,
             "topk": self.config.topk,
             "return_scores": True
         }
         
-        return requests.post(self.config.search_url, json=payload).json()
+        try:
+            response = requests.post(self.config.search_url, json=payload)
+            response.raise_for_status()  # Raise exception for non-200 responses
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Error calling search API: {str(e)}")
+            # Return empty results as fallback
+            return {"result": [[] for _ in range(len(queries))]}
 
     def _passages2string(self, retrieval_result):
-        format_reference = ''
-        for idx, doc_item in enumerate(retrieval_result):
+        """
+        단순화된 방식으로 검색 결과를 문자열로 변환합니다.
+        Gemini QA 서버에서 반환한 답변을 바로 활용합니다.
+        
+        Args:
+            retrieval_result: 검색 API에서 반환한 문서 항목 리스트
             
-            content = doc_item['document']['contents']
-            title = content.split("\n")[0]
-            text = "\n".join(content.split("\n")[1:])
-            format_reference += f"Doc {idx+1}(Title: {title}) {text}\n"
-
-        return format_reference
+        Returns:
+            모든 검색된 문서를 포함하는 형식이 지정된 문자열
+        """
+        if not retrieval_result:
+            return "No search results found."
+            
+        # 가장 간단한 형태로 답변 추출
+        for doc_item in retrieval_result:
+            # 가능한 모든 형태의 답변 필드를 확인
+            if 'document' in doc_item and 'contents' in doc_item['document']:
+                return doc_item['document']['contents']
+            elif 'contents' in doc_item:
+                return doc_item['contents']
+            elif 'text' in doc_item:
+                return doc_item['text']
+        
+        # 답변을 찾지 못한 경우 기본 메시지 반환
+        return "No valid answer found in search results."
