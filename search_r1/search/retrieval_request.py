@@ -5,8 +5,8 @@ url = "http://127.0.0.1:8000/retrieve"
 
 # Example payload
 payload = {
-    "queries": ["What is the capital of France?", "Explain neural networks."] * 5,
-    "topk": 5,
+    "queries": ["What is the capital of France?", "Explain neural networks."] * 1,
+    "topk": 2,
     "return_scores": True
 }
 

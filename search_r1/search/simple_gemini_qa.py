@@ -11,7 +11,7 @@ class SimpleGeminiQA:
                  api_key=None,
                  model_name="gemini-1.5-flash",
                  temperature=0.2,
-                 max_output_tokens=8192):
+                 max_output_tokens=500):
         """
         Initialize the Simple Gemini QA system.
         
