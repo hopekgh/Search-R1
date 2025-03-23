@@ -195,7 +195,7 @@ class Index_Builder:
         for start_idx in tqdm(range(0, len(self.corpus), self.batch_size), desc='Inference Embeddings:'):
 
             batch_data_title = self.corpus[start_idx:start_idx+self.batch_size]['title']
-            batch_data_text = self.corpus[start_idx:start_idx+self.batch_size]['text']
+            batch_data_text = self.corpus[start_idx:start_idx+self.batch_size]['contents']
             batch_data = ['"' + title + '"\n' + text for title, text in zip(batch_data_title, batch_data_text)]
 
             if self.retrieval_method == "e5":
