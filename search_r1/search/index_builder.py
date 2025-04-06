@@ -48,7 +48,7 @@ def pooling(
 
 def load_corpus(corpus_path: str):
     corpus = datasets.load_dataset( 
-            path="HanyangMed/statpearls",
+            path="HanyangMed/split-statpearls-v1",
             split="train",
             num_proc=4)
     return corpus
